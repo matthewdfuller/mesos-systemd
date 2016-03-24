@@ -13,6 +13,12 @@ echo "Using version: $VERSION"
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 HOMEDIR=$(eval echo "~`whoami`")
 
+# Before any containers can run, need to setup the IAM metadata proxy service
+# Only works in version 3
+if [ "$NODE_ROLE" = "worker" ] && [ "$VERSION" = "v3" ]; then
+  sudo bash ${SCRIPTDIR}/v3/util/iam-proxy.sh
+fi
+
 bash ${SCRIPTDIR}/$VERSION/util/setup-credentials.sh
 
 if [ -f /etc/environment ]; then

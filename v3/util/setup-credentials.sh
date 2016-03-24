@@ -14,8 +14,16 @@ if [ ! -z $SECURE_FILES ]; then
         AWS_CREDS=" -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY \
          -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_KEY "
     fi
+
+    # On the worker tier, the containers need to be launched with a role
+    # because of the IAM proxy metadata service.
+    IAM_ROLE_LABEL=""
+    if [ ! -z $CONTAINERS_ROLE ]; then
+        IAM_ROLE_LABEL=" --label com.swipely.iam-docker.iam-profile=\"$CONTAINERS_ROLE\" "
+    fi
+
     sudo docker run --rm \
-        -v ${HOMEDIR}:/data/  $AWS_CREDS behance/docker-aws-s3-downloader \
+        -v ${HOMEDIR}:/data/  $AWS_CREDS $IAM_ROLE_LABEL behance/docker-aws-s3-downloader \
          us-east-1 $CONTROL_TIER_S3SECURE_BUCKET $SECURE_FILES
 
     # must chown all files to core for use

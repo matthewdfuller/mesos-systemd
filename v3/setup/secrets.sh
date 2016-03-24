@@ -18,7 +18,14 @@ TABLE=`sudo echo $SECRETS_TABLE`
 
 docker pull behance/docker-aws-secrets-downloader:latest
 
+# On the worker tier, the containers need to be launched with a role
+# because of the IAM proxy metadata service.
+IAM_ROLE_LABEL=""
+if [ ! -z $CONTAINERS_ROLE ]; then
+    IAM_ROLE_LABEL=" --label com.swipely.iam-docker.iam-profile=\"$CONTAINERS_ROLE\" "
+fi
+
 for K in "${!SECRETMAP[@]}"; do
-        PLAINTEXT=`sudo docker run behance/docker-aws-secrets-downloader --table $TABLE --name $K`
+        PLAINTEXT=`sudo docker run $IAM_ROLE_LABEL behance/docker-aws-secrets-downloader --table $TABLE --name $K`
         etcdctl set ${SECRETMAP[$K]} $PLAINTEXT &>/dev/null
 done
