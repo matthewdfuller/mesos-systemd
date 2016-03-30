@@ -33,7 +33,7 @@ ExecStart=/usr/bin/sh -c "sudo /usr/bin/docker run \
   --authenticate_slaves \
   --credentials=/home/core/mesos-master/passwd \
   --cluster=$NODE_PRODUCT-$NODE_TIER \
-  --hostname=`curl -s http://169.254.169.254/latest/meta-data/public-hostname` \
+  --hostname=`curl -s http://169.254.169.254/latest/meta-data/local-hostname` \
   --log_dir=/var/log/mesos \
   --quorum=3 \
   --work_dir=/var/lib/mesos/master \
