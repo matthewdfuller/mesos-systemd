@@ -17,7 +17,6 @@ etcdctl set /images/flight-director "index.docker.io/behance/flight-director:lat
 etcdctl set /images/marathon     	"index.docker.io/mesosphere/marathon:v0.15.1"
 etcdctl set /images/mesos-master 	"index.docker.io/mesosphere/mesos-master:0.27.0-0.2.190.ubuntu1404"
 etcdctl set /images/zk-exhibitor 	"index.docker.io/behance/docker-zk-exhibitor:latest"
-etcdctl set /images/cfn-signal   	"index.docker.io/behance/docker-cfn-bootstrap:latest"
 
 # pull down images serially to avoid a FS layer clobbering bug in docker 1.6.x
 docker pull index.docker.io/jenkins
@@ -27,4 +26,3 @@ docker pull $(etcdctl get /images/flight-director)
 docker pull $(etcdctl get /images/marathon)
 docker pull $(etcdctl get /images/mesos-master)
 docker pull $(etcdctl get /images/zk-exhibitor)
-docker pull $(etcdctl get /images/cfn-signal)

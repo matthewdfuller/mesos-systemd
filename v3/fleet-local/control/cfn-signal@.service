@@ -6,8 +6,9 @@ After=zk-health.service mesos-master@%i.service marathon@%i.service
 
 [Service]
 EnvironmentFile=/etc/environment
-Environment="IMAGE=etcdctl get /images/cfn-signal"
+Environment="IMAGE=etcdctl get /images/awscli"
 Environment="AZ=curl -sS http://169.254.169.254/latest/meta-data/placement/availability-zone"
+Environment="INSTANCE_ID=curl -sS http://169.254.169.254/latest/meta-data/instance-id"
 Type=simple
 User=core
 Restart=on-failure
@@ -17,11 +18,12 @@ ExecStartPre=/usr/bin/systemctl is-active mesos-master@*
 ExecStartPre=/usr/bin/systemctl is-active marathon@*
 ExecStartPre=/usr/bin/sh -c "docker pull $($IMAGE)"
 ExecStartPre=/usr/bin/sh -c "/usr/bin/docker run --rm\
- $($IMAGE) cfn-signal\
- --stack $STACK_NAME\
- --region $($AZ|head -c-1)\
- --resource $CONTROL_ASG_NAME\
- --success true"
+ $($IMAGE) cloudformation signal-resource\
+ --stack-name $STACK_NAME\
+ --logical-resource-id $CONTROL_ASG_NAME\
+ --unique-id $($INSTANCE_ID)\
+ --status SUCCESS\
+ --region $($AZ|head -c-1)"
 
 ExecStart=/usr/bin/sleep infinity
 
